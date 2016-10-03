@@ -10,21 +10,19 @@ Publicly available documents already discuss exfiltration from secured systems u
 
 How to Use It
 ------------------
-Compile the problem using:
+Enter the `Using _mm_stream_si128` folder and compile using `make`. (There are also other flavors you can `make` and try in different folders!)
 
-    gcc main.c -Wall -O2 -o main
+    make
 
-And run it on an Apple MacBook Air (13-inch, Early 2015):
+Run this using a 2015 model MacBook Air. Then use a Sony STR-K670P radio receiver with the included antenna and tune it to 1580 kHz on AM.
 
-    ./main
+You should hear the "Mary Had a Little Lamb" tune playing repeatedly. Other equipment and tuning may work as well. On the equipment above, the author has achieved clear transmission over two meters of open air or one meter through drywall. Different results will be achievable with different equipment.
 
-Then use a Sony STR-K670P radio receiver with the included antenna and tune it to 1580 kHz on AM.
-
-You should hear the "Mary Had a Little Lamb" song playing repeatedly. Other equipment and tuning may work as well. On the equipment above, the author has achieved clear transmission over two meters of open air or one meter through drywall. Different results will be achievable with different equipment. Please send your results to sbr@phor.net
+Are you using an antenna? At the beginning, I placed the antenna directly on top of the number 4 key and that worked best. It was a round antenna. Then once I knew it works I moved the antenna back. Moving it back reduced the number of frequencies that it worked on, and eventually only that one (1580 kHz) worked. Different hardware will certainly have different frequency response. Here are some results that have been sent in by readers. Please mail sbr@phor.net with your results or [edit this file directly](https://github.com/fulldecent/system-bus-radio/edit/master/TEST-DATA.tsv) and create a pull request.
 
 Technical Explanation
 ------------------
-Instructions in this program cause electromagnetic radiation to emit from the computer. The emissions are of a broad frequency range. To be accepted by the radio, those frequencies must:
+This program runs instructions on the computer that cause electromagnetic radiation. The emissions are of a broad frequency range. To be accepted by the radio, those frequencies must:
 
  * Be emitted by the computer processor and other subsystems
  * Escape the computer shielding
@@ -37,6 +35,10 @@ By trial and error, the above frequency was found to be ideal for that equipment
 The actual emissions are caused by the `_mm_stream_si128` instruction that writes through to a memory address. Inspiration for using this instruction was provided in:
 
 > Guri, M., Kachlon, A., Hasson, O., Kedma, G., Mirsky, Y. and Elovici, Y., 2015. GSMem: data exfiltration from air-gapped computers over GSM frequencies. In 24th USENIX Security Symposium (USENIX Security 15) (pp. 849-864).
+>
+> https://www.usenix.org/node/190937
+
+Please note that replacing `_mm_stream_si128` with a simple `x++;` will work too. My experience has been that  `_mm_stream_si128` produces a stronger signal. There may be other ideas that work even better, and it would be nice to improve this to be more portable (not require SSE extensions).
 
 The program uses square wave modulation, which is depicted below:
 
@@ -50,7 +52,7 @@ The program uses square wave modulation, which is depicted below:
                             |<->| CARRIER
 ```
 
-Notes on high precision time APIs for Mac:
+Notes on high precision time APIs:
 
 * Get current time
   * mach_absolute_time() gives time in int64_t of nanoseconds
@@ -65,6 +67,8 @@ Notes on high precision time APIs for Mac:
   * http://stackoverflow.com/a/21352348/300224
   * https://stackoverflow.com/questions/5167269/clock-gettime-alternative-in-mac-os-x
 * Sleep
+  * mach_wait_until()
+    * Notes https://developer.apple.com/library/ios/technotes/tn2169/_index.html
   * nanosleep()
     * Apple doc https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man2/nanosleep.2.html
     * Definition https://opensource.apple.com/source/Libc/Libc-320.1.3/gen/nanosleep.c?txt
@@ -82,3 +86,8 @@ Notes on high precision time APIs for Mac:
   * msleep() https://developer.apple.com/library/mac/documentation/Darwin/Conceptual/KernelProgramming/services/services.html
     * time/timer.c /  http://lxr.free-electrons.com/source/kernel/time/timer.c#L1673
   * kern/clock.h https://opensource.apple.com/source/xnu/xnu-1456.1.26/osfmk/kern/clock.h
+
+Press coverage
+
+ * http://hardware.slashdot.org/story/16/03/01/1727226/microcasting-color-tv-by-abusing-a-wi-fi-chip
+ * http://news.softpedia.com/news/emitting-radio-waves-from-a-computer-with-no-radio-transmitting-hardware-501260.shtml
